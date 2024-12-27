@@ -14,9 +14,11 @@ set -e
 
 # Function to display usage
 usage() {
-    echo -e "${COLORS[RED]}Usage: $0 --master | --worker${COLORS[NC]}"
-    echo -e "${COLORS[BLUE]}  --master   - Run this script for the master node${COLORS[NC]}"
-    echo -e "${COLORS[BLUE]}  --worker   - Run this script for the worker node${COLORS[NC]}"
+    echo -e "${COLORS[RED]}Usage: $0 --master | --worker | --reset-master | --reset-worker${COLORS[NC]}"
+    echo -e "${COLORS[BLUE]}  --master       - Run this script for the master node${COLORS[NC]}"
+    echo -e "${COLORS[BLUE]}  --worker       - Run this script for the worker node${COLORS[NC]}"
+    echo -e "${COLORS[BLUE]}  --reset-master  - Reset the master node${COLORS[NC]}"
+    echo -e "${COLORS[BLUE]}  --reset-worker  - Reset the worker node${COLORS[NC]}"
     exit 1
 }
 
@@ -27,17 +29,44 @@ usage() {
 case "$1" in
     --master) IS_MASTER="true" ;;
     --worker) IS_MASTER="false" ;;
+    --reset-master) IS_RESET_MASTER="true" ;;
+    --reset-worker) IS_RESET_WORKER="true" ;;
     *) usage ;;
 esac
 
 # Function to install Docker
 install_docker() {
     echo -e "${COLORS[YELLOW]}Docker not found. Installing Docker...${COLORS[NC]}"
-    sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    sudo yum install -y docker-ce docker-ce-cli containerd.io
-    sudo systemctl enable --now docker
+    cd ../Docker
+    ./install.sh
     echo -e "${COLORS[GREEN]}Docker installed successfully${COLORS[NC]}"
+}
+
+# Function to reset master node
+reset_master() {
+    echo -e "${COLORS[YELLOW]}Resetting Kubernetes master node...${COLORS[NC]}"
+    sudo kubeadm reset -f
+    sudo rm -rf $HOME/.kube
+    echo -e "${COLORS[GREEN]}Master node reset successfully.${COLORS[NC]}"
+
+    echo -e "${COLORS[YELLOW]}Initializing Kubernetes master node...${COLORS[NC]}"
+    sudo kubeadm init
+
+    echo -e "${COLORS[GREEN]}Kubernetes master node initialized successfully.${COLORS[NC]}"
+    echo -e "${COLORS[BLUE]}To join a worker node to this master, run the following command:${COLORS[NC]}"
+    kubeadm token create --print-join-command
+}
+
+# Function to reset worker node
+reset_worker() {
+    echo -e "${COLORS[YELLOW]}Resetting Kubernetes worker node...${COLORS[NC]}"
+    sudo kubeadm reset -f
+    sudo rm -rf $HOME/.kube
+    echo -e "${COLORS[GREEN]}Worker node reset successfully.${COLORS[NC]}"
+
+    echo -e "${COLORS[YELLOW]}Please paste the kubeadm join command to join the worker node to the master:${COLORS[NC]}"
+    read -p "kubeadm join command: " JOIN_COMMAND
+    eval $JOIN_COMMAND
 }
 
 # Check if Docker is installed
@@ -73,8 +102,23 @@ configure_system() {
 # Function to sync containerd config
 sync_containerd_config() {
     echo -e "${COLORS[YELLOW]}Syncing containerd config...${COLORS[NC]}"
-    sudo cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
-    sudo cp /path/to/your/config.toml /etc/containerd/config.toml
+    
+    # Backup the existing config file
+    if [[ -f /etc/containerd/config.toml ]]; then
+        sudo cp /etc/containerd/config.toml /etc/containerd/config.toml.bak
+        echo -e "${COLORS[GREEN]}Backup of existing config.toml created.${COLORS[NC]}"
+    else
+        echo -e "${COLORS[YELLOW]}No existing config.toml found to backup.${COLORS[NC]}"
+    fi
+
+    # Copy the new config file if it exists
+    if [[ -f "./config.toml" ]]; then
+        sudo cp config.toml /etc/containerd/config.toml
+        echo -e "${COLORS[GREEN]}New config.toml copied successfully.${COLORS[NC]}"
+    else
+        echo -e "${COLORS[RED]}Error: './config.toml' not found. Skipping sync.${COLORS[NC]}"
+    fi
+    
     sudo systemctl restart containerd
 }
 
@@ -132,6 +176,14 @@ setup_worker() {
 }
 
 # Call functions based on node type
+if [ "$IS_RESET_MASTER" == "true" ]; then
+    reset_master
+    exit 0
+elif [ "$IS_RESET_WORKER" == "true" ]; then
+    reset_worker
+    exit 0
+fi
+
 install_docker
 configure_system
 sync_containerd_config
