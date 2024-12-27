@@ -1,4 +1,5 @@
 # README for Docker install.sh
+![Docker Logo](https://www.vectorlogo.zone/logos/docker/docker-official.svg)
 
 ## Overview
 The `install.sh` script automates the installation of Docker on a RHEL-based system. It checks for the presence of Docker and installs it along with necessary dependencies if it is not already installed. The script also enables and starts the Docker service to ensure it is ready for use.
