@@ -1,0 +1,16 @@
+# .github/workflows/bash-checks.yml
+name: Bash Checks
+
+on: [push, pull_request]
+
+  spellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install aspell
+        run: sudo apt-get install -y aspell
+
+      - name: Spellcheck Bash scripts
+        run: find . -name '*.sh' -exec aspell list < {} | sort -u \; 
