@@ -37,7 +37,7 @@ esac
 # Function to install Docker
 install_docker() {
     echo -e "${COLORS[YELLOW]}Docker not found. Installing Docker...${COLORS[NC]}"
-    cd ../Docker
+    cd ../Docker || exit
     ./install.sh
     echo -e "${COLORS[GREEN]}Docker installed successfully${COLORS[NC]}"
 }
@@ -46,7 +46,7 @@ install_docker() {
 reset_master() {
     echo -e "${COLORS[YELLOW]}Resetting Kubernetes master node...${COLORS[NC]}"
     sudo kubeadm reset -f
-    sudo rm -rf $HOME/.kube
+    sudo rm -rf "$HOME/.kube"
     echo -e "${COLORS[GREEN]}Master node reset successfully.${COLORS[NC]}"
 
     echo -e "${COLORS[YELLOW]}Initializing Kubernetes master node...${COLORS[NC]}"
@@ -61,12 +61,12 @@ reset_master() {
 reset_worker() {
     echo -e "${COLORS[YELLOW]}Resetting Kubernetes worker node...${COLORS[NC]}"
     sudo kubeadm reset -f
-    sudo rm -rf $HOME/.kube
+    sudo rm -rf "$HOME/.kube"
     echo -e "${COLORS[GREEN]}Worker node reset successfully.${COLORS[NC]}"
 
     echo -e "${COLORS[YELLOW]}Please paste the kubeadm join command to join the worker node to the master:${COLORS[NC]}"
-    read -p "kubeadm join command: " JOIN_COMMAND
-    eval $JOIN_COMMAND
+    read -r -p "kubeadm join command: " JOIN_COMMAND
+    eval "$JOIN_COMMAND"
 }
 
 # Check if Docker is installed
@@ -113,7 +113,7 @@ sync_containerd_config() {
 
     # Copy the new config file if it exists
     if [[ -f "./config.toml" ]]; then
-        sudo cp config.toml /etc/containerd/config.toml
+        sudo cp "./config.toml" /etc/containerd/config.toml
         echo -e "${COLORS[GREEN]}New config.toml copied successfully.${COLORS[NC]}"
     else
         echo -e "${COLORS[RED]}Error: './config.toml' not found. Skipping sync.${COLORS[NC]}"
@@ -167,9 +167,9 @@ initialize_master() {
 setup_worker() {
     echo -e "${COLORS[YELLOW]}Setting up worker node...${COLORS[NC]}"
     echo -e "${COLORS[YELLOW]}Paste the 'kubeadm join' command from the master node below:${COLORS[NC]}"
-    read -p "kubeadm join command: " JOIN_CMD
+    read -r -p "kubeadm join command: " JOIN_CMD
     echo -e "${COLORS[YELLOW]}Executing join command...${COLORS[NC]}"
-    sudo $JOIN_CMD
+    sudo "$JOIN_CMD"
     echo -e "${COLORS[YELLOW]}Setting up kubeconfig...${COLORS[NC]}"
     mkdir -p "$HOME/.kube"
     echo -e "${COLORS[YELLOW]}Please copy the kubeconfig file from master node to $HOME/.kube/config${COLORS[NC]}"

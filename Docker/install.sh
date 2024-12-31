@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Define colors for output
 declare -A COLORS=(
     [RED]='\033[0;31m'   # Red color for error messages
