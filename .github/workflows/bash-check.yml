@@ -3,14 +3,27 @@ name: Bash Check
 on: [push, pull_request]
 
 jobs:
-  bashcheck:
+  lint:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Run ShellCheck
-        uses: ludovicchabant/action-shellcheck@v1
-        with:
-          args: '**/*.sh'
+    - name: Install ShellCheck
+      run: |
+        echo "Installing ShellCheck..."
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
+        which shellcheck || (echo "ShellCheck installation failed" && exit 1)
+      
+    - name: Lint Bash scripts
+      run: |
+        echo "Running ShellCheck..."
+        find . -name "*.sh" -print0 | xargs -0 shellcheck -f gcc | tee shellcheck.log
+        if grep -q "error:" shellcheck.log; then
+          echo "Linting errors found!"
+          exit 1
+        else
+          echo "No linting errors found."
+        fi
