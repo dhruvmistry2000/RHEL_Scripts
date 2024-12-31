@@ -1,0 +1,16 @@
+name: Bash Check
+
+on: [push, pull_request]
+
+jobs:
+  bashcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run ShellCheck
+        uses: ludovicchabant/ssh-check@v1
+        with:
+          args: '**/*.sh'
