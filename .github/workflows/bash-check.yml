@@ -11,6 +11,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run ShellCheck
-        uses: ludovicchabant/ssh-check@v1
+        uses: ludovicchabant/action-shellcheck@v1
         with:
           args: '**/*.sh'
