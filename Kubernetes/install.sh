@@ -113,7 +113,7 @@ sync_containerd_config() {
 
     # Copy the new config file if it exists
     if [[ -f "./config.toml" ]]; then
-        sudo cp "./config.toml" /etc/containerd/config.toml
+        sudo cp ./config.toml /etc/containerd/config.toml
         echo -e "${COLORS[GREEN]}New config.toml copied successfully.${COLORS[NC]}"
     else
         echo -e "${COLORS[RED]}Error: './config.toml' not found. Skipping sync.${COLORS[NC]}"
