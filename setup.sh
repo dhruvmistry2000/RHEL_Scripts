@@ -1,5 +1,5 @@
-#!/bin/bash
-set -x 
+#!/bin/sh -e
+
 # Clone the repository
 git clone https://github.com/dhruvmistry2000/RHEL_Scripts.git
 cd RHEL_Scripts
