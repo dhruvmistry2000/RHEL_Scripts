@@ -10,6 +10,5 @@ I encourage you to try out the scripts available in this repository. Your feedba
 To run the setup script, simply execute the following command in your terminal:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/dhruvmistry2000/RHEL_Scripts/main/setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/dhruvmistry2000/RHEL_Scripts/refs/heads/master/setup.sh | bash
 ```
-
