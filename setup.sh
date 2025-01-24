@@ -8,7 +8,8 @@ cd RHEL_Scripts
 echo "Which directory would you like to run scripts from?"
 echo "1. Docker"
 echo "2. Kubernetes"
-read -p "Please enter your choice (1 or 2): " choice
+printf "Please enter your choice (1 or 2): "
+read choice
 
 # Run the appropriate script based on user choice
 case $choice in
@@ -28,7 +29,8 @@ case $choice in
         echo "2. Initialize worker node"
         echo "3. Reset master node"
         echo "4. Reset worker node"
-        read -p "Please enter your choice (1-4): " action_choice
+        printf "Please enter your choice (1-4): "
+        read action_choice
 
         case $action_choice in
             1)
