@@ -9,7 +9,7 @@ echo "Which directory would you like to run scripts from?"
 echo "1. Docker"
 echo "2. Kubernetes"
 printf "Please enter your choice (1 or 2): "
-read choice
+read -r choice
 
 # Run the appropriate script based on user choice
 case $choice in
@@ -30,7 +30,7 @@ case $choice in
         echo "3. Reset master node"
         echo "4. Reset worker node"
         printf "Please enter your choice (1-4): "
-        read action_choice
+        read -r action_choice
 
         case $action_choice in
             1)
