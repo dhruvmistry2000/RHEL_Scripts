@@ -8,7 +8,8 @@ cd RHEL_Scripts
 echo "Which directory would you like to run scripts from?"
 echo "1. Docker"
 echo "2. Kubernetes"
-read -p "Please enter your choice (1 or 2): " choice
+echo "3. Jenkins"
+read -p "Please enter your choice (1, 2, or 3): " choice
 
 # Run the appropriate script based on user choice
 case $choice in
@@ -49,8 +50,14 @@ case $choice in
                 ;;
         esac
         ;;
+    3)
+        echo "Running scripts from the Jenkins directory..."
+        cd Jenkins
+        # Assuming there is a script to run in the Jenkins directory
+        ./install.sh
+        ;;
     *)
-        echo "Invalid choice. Please run the script again and select 1 or 2."
+        echo "Invalid choice. Please run the script again and select 1, 2, or 3."
         exit 1
         ;;
 esac
